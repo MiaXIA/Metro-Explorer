@@ -35,9 +35,9 @@ dependencies {
     })
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 
-    //compile 'com.github.kittinunf.fuel:fuel:<latest-version>' //for JVM
-    //compile 'com.github.kittinunf.fuel:fuel-android:<latest-version>' //for Android
-    //compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
-    //compile 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>' //for LiveData support
-    //compile 'com.github.kittinunf.fuel:fuel-gson:<latest-version>' //for Gson support
+    compile 'com.github.kittinunf.fuel:fuel:<latest-version>' //for JVM
+    compile 'com.github.kittinunf.fuel:fuel-android:<latest-version>' //for Android
+    compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
+    compile 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>' //for LiveData support
+    compile 'com.github.kittinunf.fuel:fuel-gson:<latest-version>' //for Gson support
 }
