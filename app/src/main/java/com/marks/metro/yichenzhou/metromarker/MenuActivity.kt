@@ -2,6 +2,7 @@ package com.marks.metro.yichenzhou.metromarker
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelManager
 
@@ -12,6 +13,7 @@ class MenuActivity : AppCompatActivity() {
         setContentView(R.layout.activity_menu)
 
         this.requestMetroList()
+        //Log.d("test", "Hello World")
     }
 
     private fun requestMetroList() {
