@@ -5,6 +5,7 @@ import android.content.res.AssetManager
 import android.util.Log
 import com.koushikdutta.ion.Ion
 import com.marks.metro.yichenzhou.metromarker.model.MetroStation
+import io.realm.Case
 import io.realm.Realm
 import java.nio.charset.Charset
 
@@ -14,7 +15,7 @@ import java.nio.charset.Charset
 
 object AppHelper {
     val TAG = "AppHelper"
-    val GOOGLE_PLACE_KEY = "AIzaSyAGQWfAqWM8pzYtjbHIN_hhNhcE4BzS2UU"
+    val GOOGLE_PLACES_KEY = "AIzaSyAGQWfAqWM8pzYtjbHIN_hhNhcE4BzS2UU"
     val GOOGLE_PLACES_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 
     // Extension for AssetManager
@@ -47,17 +48,26 @@ object AppHelper {
         return  null
     }
 
+    // Search typed metro from TextField
+    // Return searched metro
+    fun searchTextMetro(content: String): List<MetroStation> {
+        val realm = Realm.getDefaultInstance()
+        return realm.where(MetroStation::class.java).contains("name", content, Case.INSENSITIVE).findAll()
+    }
+
+
     // Search nearby metro stations based on device's last known location
+    // Return or callback will give nearby metro stations
     fun searchNearbyMerto(location: String, context: Context) {
         Ion.with(context).load(GOOGLE_PLACES_SEARCH_URL)
                 .addQuery("location", location)
                 .addQuery("radius", "1000")
                 .addQuery("types", "subway_station")
-                .addQuery("key", GOOGLE_PLACE_KEY)
+                .addQuery("key", GOOGLE_PLACES_KEY)
                 .asJsonObject()
                 .setCallback { e, result ->
                     if (e != null) {
-                        Log.e(TAG, "Google Place Request Error: ${e.toString()}")
+                        Log.e(TAG, "Google Place Request Error: ${e.message}")
                     }
 
                     result?.let {

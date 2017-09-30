@@ -25,7 +25,7 @@ class MenuActivity : AppCompatActivity() {
 
     private val locationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
-            Log.d(TAG, "(Lan:Lon): " + location.latitude + ", " + location.longitude)
+            Log.d(TAG, "(Lan:Lon): " + location.latitude + "," + location.longitude)
             val location = location.latitude.toString() + ", " + location.longitude.toString()
             AppHelper.searchNearbyMerto(location, applicationContext)
         }
@@ -62,6 +62,10 @@ class MenuActivity : AppCompatActivity() {
             Log.d(TAG, "Metro station data exists, count: ${stationCount.toString()}")
         }
 
-
+        // Here is how to search metro station based on local cached base
+//        val searchedTextMetro = AppHelper.searchTextMetro("Foggy")
+//        for (metro in searchedTextMetro) {
+//            Log.d(TAG, "${metro.name} + ${metro.long} + ${metro.lang}")
+//        }
     }
 }
