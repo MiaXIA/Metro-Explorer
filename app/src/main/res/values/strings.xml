@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Metro Marker</string>
+    <string name="geo_test_btn">Geo Test</string>
 </resources>
