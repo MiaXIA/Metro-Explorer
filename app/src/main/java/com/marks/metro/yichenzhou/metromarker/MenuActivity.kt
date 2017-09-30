@@ -8,6 +8,10 @@ import android.location.LocationManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import com.google.android.gms.location.places.GeoDataClient
+import com.google.android.gms.location.places.Place
+import com.google.android.gms.location.places.PlaceDetectionClient
+import com.google.android.gms.location.places.Places
 import com.marks.metro.yichenzhou.metromarker.helper.AppHelper
 import com.marks.metro.yichenzhou.metromarker.model.MetroStation
 import io.realm.Realm
@@ -21,8 +25,11 @@ class MenuActivity : AppCompatActivity() {
 
     private val locationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
-            Log.d(TAG, "(Long:Lang): " + location.longitude + " : " + location.latitude)
+            Log.d(TAG, "(Lan:Lon): " + location.latitude + ", " + location.longitude)
+            val location = location.latitude.toString() + ", " + location.longitude.toString()
+            AppHelper.searchNearbyMerto(location, applicationContext)
         }
+
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {}
         override fun onProviderDisabled(provider: String) {}
@@ -39,6 +46,7 @@ class MenuActivity : AppCompatActivity() {
 
         locationTestButton.setOnClickListener {
             try {
+                // We use location manager to fetch current location
                 this.locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
             } catch (e: SecurityException) {
                 Log.e(TAG, e.message)
@@ -53,5 +61,7 @@ class MenuActivity : AppCompatActivity() {
         } else {
             Log.d(TAG, "Metro station data exists, count: ${stationCount.toString()}")
         }
+
+
     }
 }
