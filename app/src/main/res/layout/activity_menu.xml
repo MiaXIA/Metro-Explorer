@@ -6,6 +6,11 @@
     android:layout_height="match_parent"
     tools:context="com.marks.metro.yichenzhou.metromarker.MenuActivity">
 
+    <Button
+        android:id="@+id/locationTestButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/geo_test_btn"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
