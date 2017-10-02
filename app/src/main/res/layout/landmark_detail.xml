@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/land_mark_image"
+        android:src="@drawable/red_heart"
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:layout_alignParentTop="true"
+        />
+
+    <TextView
+        android:id="@+id/land_mark_details"
+        android:layout_width="match_parent"
+        android:background="@color/colorTextField"
+        android:layout_height="230dp"
+        android:layout_below="@+id/land_mark_image"
+        />
+
+    <ImageButton
+        android:id="@+id/add_favourite_button"
+        android:src="@drawable/blank_heart"
+        android:scaleType="centerCrop"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:background="@color/colorBlue"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/land_mark_image"/>
+
+    <ImageButton
+        android:id="@+id/share_link_button"
+        android:src="@drawable/red_heart"
+        android:scaleType="centerCrop"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/go_button" />
+
+    <Button
+        android:id="@+id/go_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:text="@string/go_button"
+        android:textColor="@color/colorWhite"/>
+
+</RelativeLayout>
