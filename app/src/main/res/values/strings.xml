@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Metro Marker</string>
+
+    <string name="explore_button">Explore!</string>
+    <string name="detail_button">Detail</string>
+    <string name="go_button">Detail</string>
 </resources>
