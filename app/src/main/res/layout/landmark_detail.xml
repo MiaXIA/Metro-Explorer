@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context="com.marks.metro.yichenzhou.metromarker.activity.LandMarkDetailActivity">
     <ImageView
         android:id="@+id/land_mark_image"
         android:src="@drawable/red_heart"
@@ -24,18 +26,19 @@
         android:scaleType="centerCrop"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        android:background="@color/colorBlue"
+        android:background="@color/colorWhite"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/land_mark_image"/>
+        android:layout_above="@id/land_mark_details"/>
 
     <ImageButton
         android:id="@+id/share_link_button"
-        android:src="@drawable/red_heart"
+        android:src="@drawable/share_link"
         android:scaleType="centerCrop"
         android:layout_width="45dp"
         android:layout_height="45dp"
+        android:background="@color/colorWhite"
         android:layout_alignParentRight="true"
-        android:layout_above="@+id/go_button" />
+        android:layout_below="@+id/land_mark_image" />
 
     <Button
         android:id="@+id/go_button"
