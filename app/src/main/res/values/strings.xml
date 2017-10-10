@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">Metro Marker</string>
+    <string name="app_name">Metro Explorer</string>
 
     <string name="explore_button">Explore!</string>
     <string name="detail_button">Detail</string>
-    <string name="go_button">Detail</string>
+    <string name="go_button">Go!</string>
+
+    <string name="test">*TEST*</string>
 </resources>
