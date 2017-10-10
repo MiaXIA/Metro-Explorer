@@ -4,6 +4,7 @@
     <string name="explore_button">Explore!</string>
     <string name="detail_button">Detail</string>
     <string name="go_button">Go!</string>
+    <string name="search_hint">Search a metro station</string>
 
     <string name="test">*TEST*</string>
 </resources>

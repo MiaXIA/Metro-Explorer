@@ -8,6 +8,9 @@ import android.location.LocationManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.SearchView
 import com.google.android.gms.location.places.GeoDataClient
 import com.google.android.gms.location.places.Place
 import com.google.android.gms.location.places.PlaceDetectionClient
@@ -52,6 +55,10 @@ class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
             Log.e(TAG, e.message)
         }
 
+        //setup toolbar
+        setSupportActionBar(station_filter_toolbar)
+
+
         favorite_button.setOnClickListener {
             //favorite button listener
             loadFavoriteData()
@@ -69,7 +76,7 @@ class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
             activityUiThread {
                 //TODO
                 //load the favorite list data and jump to the List UI
-                val intent = Intent(this@MenuActivity, MetroStationActivity::class.java)
+                val intent = Intent(this@MenuActivity, LandMarksActivity::class.java)
 
                 startActivity(intent)
             }
@@ -105,9 +112,20 @@ class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
 //            AppHelper.searchNearbyMerto(location, applicationContext)
         }
 
+
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {}
         override fun onProviderDisabled(provider: String) {}
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.stationfilter, menu)
+
+        //TODO
+        //MenuItem searchItem = menu.findItem(R.id.station_filter_search)
+        //SearchView() searchView = (SearchView) MenuItemCompat.getActionView(searchItem)
+
+        return super.onCreateOptionsMenu(menu)
     }
 }
 
