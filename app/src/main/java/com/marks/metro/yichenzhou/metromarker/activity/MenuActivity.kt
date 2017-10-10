@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.marks.metro.yichenzhou.metromarker.R
 import com.marks.metro.yichenzhou.metromarker.helper.AppHelper
+import com.marks.metro.yichenzhou.metromarker.helper.LocationDetector
 import io.realm.Realm
 import kotlin.properties.Delegates
 import kotlinx.android.synthetic.main.main_menu.*
@@ -63,6 +64,10 @@ class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
         this.locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         this.mapFragment = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment?
 
+        // Set default location on the MAP
+
+
+        // Fetch current location and show on the mapView
         if (AppHelper.checkPermissionStatus(AppHelper.LOCATION_DEFAULT_CODE, this)) {
             try {
                 this.locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
@@ -83,7 +88,7 @@ class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    fun loadFavoriteData() {
+    private fun loadFavoriteData() {
         doAsync {
             activityUiThread {
                 //TODO
@@ -100,14 +105,15 @@ class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
         //searchview text filled detect
     }
 
-    override fun onMapReady(p0: GoogleMap?) {
+    override fun onMapReady(map: GoogleMap?) {
         val location = LatLng(this.latitude, this.longitude)
-        if (p0 !is GoogleMap) {
-            Log.e(TAG, "Invalid type for p0")
+        if (map !is GoogleMap) {
+            Log.e(TAG, "Invalid type for map")
             return
         }
-        p0.addMarker(MarkerOptions().position(location).title("My Location"))
-        p0.moveCamera(CameraUpdateFactory.newLatLng(location))
+        map.addMarker(MarkerOptions().position(location).title("My Location"))
+        map.setMaxZoomPreference(15.0f)
+        map.moveCamera(CameraUpdateFactory.newLatLng(location))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
