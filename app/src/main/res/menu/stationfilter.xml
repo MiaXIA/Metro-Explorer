@@ -5,9 +5,16 @@
     <item
         android:id="@+id/station_filter_search"
         android:icon="@drawable/ic_search"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         app:actionViewClass="android.support.v7.widget.SearchView"
         android:title="@string/search"
+        />
+
+    <item
+        android:id="@+id/favorite_button"
+        android:title="@string/favorite_icon"
+        android:icon="@drawable/red_heart"
+        app:showAsAction="ifRoom"
         />
 
 </menu>

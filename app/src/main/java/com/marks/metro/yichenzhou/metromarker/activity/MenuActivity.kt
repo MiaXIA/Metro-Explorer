@@ -9,6 +9,7 @@ import android.location.LocationManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat.startActivity
 import android.util.Log
 import android.view.Menu
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -60,11 +61,11 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         //setup toolbar
         setSupportActionBar(station_filter_toolbar)
 
-
-        favorite_button.setOnClickListener {
+        //TODO
+        //favorite_button.setOnClickListener {
             //favorite button listener
-            loadFavoriteData()
-        }
+            //loadFavoriteData()
+        //}
 
         explore_button.setOnClickListener {
             //explore button listener
