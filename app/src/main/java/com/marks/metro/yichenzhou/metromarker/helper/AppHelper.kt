@@ -1,7 +1,9 @@
 package com.marks.metro.yichenzhou.metromarker.helper
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.AssetManager
+import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.koushikdutta.ion.Ion
 import com.marks.metro.yichenzhou.metromarker.model.MetroStation
@@ -17,6 +19,12 @@ object AppHelper {
     val TAG = "AppHelper"
     val GOOGLE_PLACES_KEY = "AIzaSyAGQWfAqWM8pzYtjbHIN_hhNhcE4BzS2UU"
     val GOOGLE_PLACES_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+
+    val LOCATION_PERMISSION_REQUEST_CODE: Int = 777
+    val NETWORK_PERMISSION_REQUEST_CODE: Int = 778
+
+    val LOCATION_DEFAULT_CODE: String = android.Manifest.permission.ACCESS_FINE_LOCATION
+    val NETWORK_DEFAULT_CODE: String = android.Manifest.permission.ACCESS_NETWORK_STATE
 
     // Extension for AssetManager
     private fun AssetManager.fileAsString(fileName: String): String {
@@ -84,5 +92,15 @@ object AppHelper {
                         }
                     }
                 }
+    }
+
+    // Ask Package Manager is the permission granted
+    fun checkPermissionStatus(serviceDefaultCode: String, context: Context): Boolean {
+        val permissionStatus = ContextCompat.checkSelfPermission(context, serviceDefaultCode)
+        if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
+            return true
+        }
+
+        return false
     }
 }
