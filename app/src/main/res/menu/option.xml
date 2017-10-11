@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/favorite_option"
-        android:title="@string/test"
+        android:title="@string/favorite_option"
         app:showAsAction="never"/>
 
     <item
         android:id="@+id/share_option"
-        android:title="@string/test"
+        android:title="@string/share_option"
         app:showAsAction="never"
         />
 </menu>

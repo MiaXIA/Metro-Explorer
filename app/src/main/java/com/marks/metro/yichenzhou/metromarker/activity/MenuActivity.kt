@@ -7,7 +7,9 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.ActionBar
 import android.util.Log
+import android.util.Log.i
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.SearchView
@@ -121,11 +123,13 @@ class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.stationfilter, menu)
 
-        //TODO
-        //MenuItem searchItem = menu.findItem(R.id.station_filter_search)
-        //SearchView() searchView = (SearchView) MenuItemCompat.getActionView(searchItem)
+        return true
+    }
 
-        return super.onCreateOptionsMenu(menu)
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        //TODO
+        //use the text to filter station
+        return super.onPrepareOptionsMenu(menu)
     }
 }
 

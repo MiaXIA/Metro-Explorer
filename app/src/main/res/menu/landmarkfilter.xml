@@ -6,6 +6,7 @@
         android:id="@+id/land_mark_search"
         android:icon="@drawable/ic_search"
         app:showAsAction="always"
-        android:title="@string/test" />
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        android:title="@string/search" />
 
 </menu>
