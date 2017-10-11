@@ -1,21 +1,23 @@
 package com.marks.metro.yichenzhou.metromarker.activity
 
+import android.app.SearchManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.Intent
 import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.view.Menu
+import android.support.v7.widget.SearchView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.marks.metro.yichenzhou.metromarker.R
 import com.marks.metro.yichenzhou.metromarker.helper.AppHelper
@@ -28,11 +30,11 @@ import org.jetbrains.anko.doAsync
 
 class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnMapReadyCallback {
     private val TAG = "MenuActivity"
-    private var realm: Realm by Delegates.notNull()
-    private var locationManager: LocationManager? = null
-    private var mapFragment: SupportMapFragment? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private var realm: Realm by Delegates.notNull()
+    private lateinit var locationManager: LocationManager
+    private lateinit var mapFragment: SupportMapFragment
     private lateinit var locationDetector: LocationDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,8 +46,8 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         // Properties Initialization
         Realm.init(applicationContext)
         this.realm = Realm.getDefaultInstance()
-        this.locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
-        this.mapFragment = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment?
+        this.locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        this.mapFragment = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
         this.locationDetector = LocationDetector(this)
         this.locationDetector.locationListener = this
 
@@ -57,16 +59,16 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
             this.locationDetector.detectLocation()
         }
 
-        //setup toolbar
-        setSupportActionBar(station_filter_toolbar)
+        //Setup toolBar
+        this.setSupportActionBar(station_filter_toolbar)
 
 
-        favorite_button.setOnClickListener {
+        this.favorite_button.setOnClickListener {
             //favorite button listener
             loadFavoriteData()
         }
 
-        explore_button.setOnClickListener {
+        this.explore_button.setOnClickListener {
             //explore button listener
             exploreMetroStation()
 
@@ -92,13 +94,15 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
 
     override fun onMapReady(map: GoogleMap?) {
         val location = LatLng(this.latitude, this.longitude)
+        val builder = LatLngBounds.Builder()
+        builder.include(location)
         if (map !is GoogleMap) {
             Log.e(TAG, "Invalid type for map")
             return
         }
         map.addMarker(MarkerOptions().position(location).title("My Location"))
-        map.setMaxZoomPreference(15.0f)
-        map.moveCamera(CameraUpdateFactory.newLatLng(location))
+        map.setMaxZoomPreference(17.0f)
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -118,6 +122,12 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         }
     }
 
+    override fun locationFound(location: Location) {
+        this.latitude = location.latitude
+        this.longitude = location.longitude
+        mapFragment!!.getMapAsync(this@MenuActivity)
+    }
+
     override fun locationNotFound(reason: LocationDetector.FailureReason) {
         when(reason) {
             LocationDetector.FailureReason.TIMEOUT -> Log.e(TAG, "Location Detection Time Out")
@@ -125,22 +135,36 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         }
     }
 
-    override fun locationFound(location: Location) {
-        this.latitude = location.latitude
-        this.longitude = location.longitude
-        mapFragment!!.getMapAsync(this@MenuActivity)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.stationfilter, menu)
+        if (menu == null) {
+            Log.e(TAG, "Menu instance is null")
+            return false
+        }
+        val searchItem = menu.findItem(R.id.station_filter_search)
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchView = menu.findItem(R.id.station_filter_search).actionView as SearchView
 
-        return true
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextChange(msg: String): Boolean {
+                Log.d(TAG, "Changed: $msg")
+                return true
+            }
+
+            override fun onQueryTextSubmit(msg: String): Boolean {
+                Log.d(TAG, "Submitted: $msg")
+                searchView.clearFocus()
+                searchItem.collapseActionView()
+                return false
+            }
+        })
+
+        return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        //TODO
-        //use the text to filter station
-        return super.onPrepareOptionsMenu(menu)
-    }
 }
+
+
+
 
