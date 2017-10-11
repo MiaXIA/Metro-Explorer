@@ -4,6 +4,13 @@
     <string name="explore_button">Explore!</string>
     <string name="detail_button">Detail</string>
     <string name="go_button">Go!</string>
+    <string name="search_hint">Search a metro station</string>
+    <string name="favorite_option">Add As Favorite</string>
+    <string name="share_option">Share</string>
+    <string name="search">Search</string>
 
     <string name="test">*TEST*</string>
+    <string name="recyclerview_image">Recycler View Image</string>
+    <string name="favorite_icon">Favorite Icon</string>
+    <string name="land_mark_image">Land Mark Image</string>
 </resources>
