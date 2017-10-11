@@ -1,6 +1,5 @@
 package com.marks.metro.yichenzhou.metromarker.activity
 
-import android.app.SearchManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.Intent
@@ -11,7 +10,12 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.view.Menu
-import android.support.v7.widget.SearchView
+import android.view.MenuItem
+import android.support.v7.widget.Toolbar
+import ca.allanwang.kau.searchview.SearchItem
+import ca.allanwang.kau.searchview.SearchView
+import ca.allanwang.kau.searchview.bindSearchView
+import ca.allanwang.kau.utils.bindView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -22,6 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.marks.metro.yichenzhou.metromarker.R
 import com.marks.metro.yichenzhou.metromarker.helper.AppHelper
 import com.marks.metro.yichenzhou.metromarker.helper.LocationDetector
+import com.marks.metro.yichenzhou.metromarker.model.MetroStation
 import io.realm.Realm
 import kotlin.properties.Delegates
 import kotlinx.android.synthetic.main.main_menu.*
@@ -33,6 +38,8 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var realm: Realm by Delegates.notNull()
+    private var searchView: SearchView? = null
+    val toolbar: Toolbar by bindView(R.id.station_filter_toolbar)
     private lateinit var locationManager: LocationManager
     private lateinit var mapFragment: SupportMapFragment
     private lateinit var locationDetector: LocationDetector
@@ -46,6 +53,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         // Properties Initialization
         Realm.init(applicationContext)
         this.realm = Realm.getDefaultInstance()
+        this.loadMetroData()
         this.locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         this.mapFragment = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
         this.locationDetector = LocationDetector(this)
@@ -60,7 +68,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         }
 
         //Setup toolBar
-        this.setSupportActionBar(station_filter_toolbar)
+        this.setSupportActionBar(toolbar)
 
 
         this.favorite_button.setOnClickListener {
@@ -75,6 +83,12 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         }
     }
 
+    private fun loadMetroData() {
+        val stationCount = this.realm.where(MetroStation::class.java).findAll().count()
+        if (stationCount == 0) {
+            AppHelper.loadStationsData("Stations.csv", applicationContext)
+        }
+    }
     private fun loadFavoriteData() {
         doAsync {
             activityUiThread {
@@ -125,7 +139,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
     override fun locationFound(location: Location) {
         this.latitude = location.latitude
         this.longitude = location.longitude
-        mapFragment!!.getMapAsync(this@MenuActivity)
+        mapFragment.getMapAsync(this@MenuActivity)
     }
 
     override fun locationNotFound(reason: LocationDetector.FailureReason) {
@@ -136,34 +150,38 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.stationfilter, menu)
+        this.menuInflater.inflate(R.menu.stationfilter, menu)
         if (menu == null) {
             Log.e(TAG, "Menu instance is null")
             return false
         }
-        val searchItem = menu.findItem(R.id.station_filter_search)
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = menu.findItem(R.id.station_filter_search).actionView as SearchView
-
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
-            override fun onQueryTextChange(msg: String): Boolean {
-                Log.d(TAG, "Changed: $msg")
-                return true
+        if (this.searchView == null) this.searchView = bindSearchView(menu, R.id.station_filter_search) {
+            textCallback = { query, searchView ->
+                searchView.findFocus()
+                val stations = AppHelper.searchTextMetro(query).sortedBy { it.name }.map { SearchItem(it.name) }
+                searchView.results = stations
             }
 
-            override fun onQueryTextSubmit(msg: String): Boolean {
-                Log.d(TAG, "Submitted: $msg")
-                searchView.clearFocus()
-                searchItem.collapseActionView()
-                return false
+            searchCallback = {query, _ ->
+                Log.d(TAG, "Query Content: $query")
+                true
             }
-        })
 
-        return super.onCreateOptionsMenu(menu)
+            textDebounceInterval = 0
+            noResultsFound = R.string.no_results
+            shouldClearOnClose = false
+            onItemClick = {position, key, content, searchView ->
+                Log.d(TAG, "Query Positiont: $position")
+                Log.d(TAG, "Query Key: $key")
+                Log.d(TAG, "Query Content: $content")
+                searchView.revealClose()
+            }
+        }
+
+        return true
     }
-
 }
+
 
 
 
