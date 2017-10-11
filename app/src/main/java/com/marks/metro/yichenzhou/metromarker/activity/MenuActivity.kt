@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat.startActivity
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -61,17 +62,26 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         //setup toolbar
         setSupportActionBar(station_filter_toolbar)
 
-        //TODO
-        //favorite_button.setOnClickListener {
-            //favorite button listener
-            //loadFavoriteData()
-        //}
-
         explore_button.setOnClickListener {
             //explore button listener
             exploreMetroStation()
 
         }
+
+        favorite_button.setOnClickListener {
+            //load favorite data and jump to the List UI
+            loadFavoriteData()
+        }
+
+        nearest_button.setOnClickListener {
+            //show the nearest stations' markers
+            showNearestStations()
+        }
+    }
+
+    private fun showNearestStations() {
+        //TODO
+        //show the nearest station markers
     }
 
     private fun loadFavoriteData() {
@@ -86,7 +96,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         }
     }
 
-    fun exploreMetroStation() {
+    private fun exploreMetroStation() {
         //TODO
         //searchview text filled detect
     }
