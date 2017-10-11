@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.util.Log
+import android.view.Menu
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -56,6 +57,10 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
             this.locationDetector.detectLocation()
         }
 
+        //setup toolbar
+        setSupportActionBar(station_filter_toolbar)
+
+
         favorite_button.setOnClickListener {
             //favorite button listener
             loadFavoriteData()
@@ -73,7 +78,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
             activityUiThread {
                 //TODO
                 //load the favorite list data and jump to the List UI
-                val intent = Intent(this@MenuActivity, MetroStationActivity::class.java)
+                val intent = Intent(this@MenuActivity, LandMarksActivity::class.java)
 
                 startActivity(intent)
             }
@@ -124,6 +129,18 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         this.latitude = location.latitude
         this.longitude = location.longitude
         mapFragment!!.getMapAsync(this@MenuActivity)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.stationfilter, menu)
+
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        //TODO
+        //use the text to filter station
+        return super.onPrepareOptionsMenu(menu)
     }
 }
 
