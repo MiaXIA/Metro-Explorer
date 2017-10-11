@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.view.Menu
-import android.view.MenuItem
 import android.support.v7.widget.Toolbar
 import ca.allanwang.kau.searchview.SearchItem
 import ca.allanwang.kau.searchview.SearchView
@@ -70,6 +69,11 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         //Setup toolBar
         this.setSupportActionBar(toolbar)
 
+        explore_button.setOnClickListener {
+            //explore button listener
+            exploreMetroStation()
+
+        }
 
         this.favorite_button.setOnClickListener {
             //favorite button listener
@@ -101,7 +105,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         }
     }
 
-    fun exploreMetroStation() {
+    private fun exploreMetroStation() {
         //TODO
         //searchview text filled detect
     }
