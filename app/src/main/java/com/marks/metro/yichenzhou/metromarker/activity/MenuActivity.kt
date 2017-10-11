@@ -18,38 +18,21 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.marks.metro.yichenzhou.metromarker.R
 import com.marks.metro.yichenzhou.metromarker.helper.AppHelper
+import com.marks.metro.yichenzhou.metromarker.helper.LocationDetector
 import io.realm.Realm
 import kotlin.properties.Delegates
 import kotlinx.android.synthetic.main.main_menu.*
 import org.jetbrains.anko.activityUiThread
 import org.jetbrains.anko.doAsync
 
-class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
+class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnMapReadyCallback {
     private val TAG = "MenuActivity"
     private var realm: Realm by Delegates.notNull()
     private var locationManager: LocationManager? = null
     private var mapFragment: SupportMapFragment? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
-
-    private val locationListener: LocationListener = object : LocationListener {
-        override fun onLocationChanged(location: Location) {
-            latitude = location.latitude
-            longitude = location.longitude
-            if (mapFragment != null) {
-                mapFragment!!.getMapAsync(this@MenuActivity)
-            } else {
-                Log.e(TAG, "Invalid type for mapFragment")
-            }
-            Log.d(TAG, "(Latitude, Longitude): " + location.latitude + "," + location.longitude)
-//            val location = location.latitude.toString() + ", " + location.longitude.toString()
-//            AppHelper.searchNearbyMerto(location, applicationContext)
-        }
-
-        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
-        override fun onProviderEnabled(provider: String) {}
-        override fun onProviderDisabled(provider: String) {}
-    }
+    private lateinit var locationDetector: LocationDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,13 +45,15 @@ class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
         this.realm = Realm.getDefaultInstance()
         this.locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         this.mapFragment = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment?
+        this.locationDetector = LocationDetector(this)
+        this.locationDetector.locationListener = this
 
+        // Set default location on the MAP
+
+
+        // Fetch current location and show on the mapView
         if (AppHelper.checkPermissionStatus(AppHelper.LOCATION_DEFAULT_CODE, this)) {
-            try {
-                this.locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
-            } catch (e: SecurityException) {
-                Log.e(TAG, e.message)
-            }
+            this.locationDetector.detectLocation()
         }
 
         favorite_button.setOnClickListener {
@@ -83,7 +68,7 @@ class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    fun loadFavoriteData() {
+    private fun loadFavoriteData() {
         doAsync {
             activityUiThread {
                 //TODO
@@ -100,14 +85,15 @@ class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
         //searchview text filled detect
     }
 
-    override fun onMapReady(p0: GoogleMap?) {
+    override fun onMapReady(map: GoogleMap?) {
         val location = LatLng(this.latitude, this.longitude)
-        if (p0 !is GoogleMap) {
-            Log.e(TAG, "Invalid type for p0")
+        if (map !is GoogleMap) {
+            Log.e(TAG, "Invalid type for map")
             return
         }
-        p0.addMarker(MarkerOptions().position(location).title("My Location"))
-        p0.moveCamera(CameraUpdateFactory.newLatLng(location))
+        map.addMarker(MarkerOptions().position(location).title("My Location"))
+        map.setMaxZoomPreference(15.0f)
+        map.moveCamera(CameraUpdateFactory.newLatLng(location))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -118,17 +104,26 @@ class MenuActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
         // Where to fetch location again after location permission granted
-        try {
-            this.locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
-        } catch (e: SecurityException) {
-            Log.e(TAG, e.message)
-        }
+        this.locationDetector.detectLocation()
     }
 
     private fun requestPermission() {
         if (!AppHelper.checkPermissionStatus(AppHelper.LOCATION_DEFAULT_CODE, this)) {
             ActivityCompat.requestPermissions(this, arrayOf(AppHelper.LOCATION_DEFAULT_CODE), AppHelper.LOCATION_PERMISSION_REQUEST_CODE)
         }
+    }
+
+    override fun locationNotFound(reason: LocationDetector.FailureReason) {
+        when(reason) {
+            LocationDetector.FailureReason.TIMEOUT -> Log.e(TAG, "Location Detection Time Out")
+            LocationDetector.FailureReason.NO_PERMISSION -> Log.e(TAG, "No Permission to detect location")
+        }
+    }
+
+    override fun locationFound(location: Location) {
+        this.latitude = location.latitude
+        this.longitude = location.longitude
+        mapFragment!!.getMapAsync(this@MenuActivity)
     }
 }
 
