@@ -19,9 +19,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.marks.metro.yichenzhou.metromarker.R
 import com.marks.metro.yichenzhou.metromarker.helper.AppHelper
 import com.marks.metro.yichenzhou.metromarker.helper.LocationDetector
@@ -32,12 +30,13 @@ import kotlinx.android.synthetic.main.main_menu.*
 import org.jetbrains.anko.activityUiThread
 import org.jetbrains.anko.doAsync
 
-class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnMapReadyCallback {
+class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnMapReadyCallback, AppHelper.GooglePlacesAPICompletionListener {
     private val TAG = "MenuActivity"
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var realm: Realm by Delegates.notNull()
     private var searchView: SearchView? = null
+    private var metroList = ArrayList<MetroStation>()
     val toolbar: Toolbar by bindView(R.id.station_filter_toolbar)
     private lateinit var locationManager: LocationManager
     private lateinit var mapFragment: SupportMapFragment
@@ -57,9 +56,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         this.mapFragment = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
         this.locationDetector = LocationDetector(this)
         this.locationDetector.locationListener = this
-
-        // Set default location on the MAP
-
+        AppHelper.placeAPIListener = this
 
         // Fetch current location and show on the mapView
         if (AppHelper.checkPermissionStatus(AppHelper.LOCATION_DEFAULT_CODE, this)) {
@@ -72,18 +69,17 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
 
         this.favorite_button.setOnClickListener {
             //favorite button listener
-            loadFavoriteData()
+            this.loadFavoriteData()
         }
-
-        this.explore_button.setOnClickListener {
-            //explore button listener
-            exploreMetroStation()
-
-        }
-
+        
         this.nearest_button.setOnClickListener {
-            //TODO
-            //show the landmarks
+            this.fetchNearbyMetroStation()
+        }
+
+        this.clear_button.setOnClickListener{
+            this.metroList.removeAll { true }
+            this.locationDetector.detectLocation()
+            this.mapFragment.getMapAsync(this)
         }
     }
 
@@ -105,21 +101,28 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         }
     }
 
-    private fun exploreMetroStation() {
-        //TODO
-        //searchview text filled detect
-    }
-
     override fun onMapReady(map: GoogleMap?) {
-        val location = LatLng(this.latitude, this.longitude)
-        val builder = LatLngBounds.Builder()
-        builder.include(location)
         if (map !is GoogleMap) {
             Log.e(TAG, "Invalid type for map")
             return
         }
-        map.addMarker(MarkerOptions().position(location).title("My Location"))
-        map.setMaxZoomPreference(17.0f)
+        val builder = LatLngBounds.Builder()
+        if (this.metroList.count() == 0) {
+            // Show my current location when user launch the app
+            val location = LatLng(this.latitude, this.longitude)
+            builder.include(location)
+            map.clear()
+            map.addMarker(MarkerOptions().position(location).title("My Location"))
+        } else {
+            // Show nearby metro stations
+            for (metro in metroList) {
+                val location = LatLng(metro.lang.toDouble(), metro.long.toDouble())
+                map.addMarker(MarkerOptions().position(location).title(metro.name).icon(this.markerIcon(BitmapDescriptorFactory.HUE_AZURE)))
+                builder.include(location)
+            }
+            this.metroList.removeAll { true }
+        }
+        map.setMaxZoomPreference(15.0f)
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0))
     }
 
@@ -132,6 +135,10 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         }
         // Where to fetch location again after location permission granted
         this.locationDetector.detectLocation()
+    }
+
+    private fun markerIcon(color: Float): BitmapDescriptor {
+        return BitmapDescriptorFactory.defaultMarker(color)
     }
 
     private fun requestPermission() {
@@ -178,15 +185,56 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
                 Log.d(TAG, "Query Positiont: $position")
                 Log.d(TAG, "Query Key: $key")
                 Log.d(TAG, "Query Content: $content")
+
+
+
+                val results = AppHelper.searchTextMetro(key)
+                if (results.count() == 0) {
+                    Log.e(TAG, "No valid metro data")
+                } else {
+                    metroList.removeAll { true }
+                    metroList.add(results.first())
+                    mapFragment.getMapAsync(this@MenuActivity)
+                }
                 searchView.revealClose()
             }
         }
-
         return true
     }
+
+    private fun fetchNearbyMetroStation() {
+        if (this.latitude == 0.0 || this.longitude == 0.0) {
+            Log.e(TAG, "Invalid latitude or longitude")
+            return
+        }
+        val currentLocation = "${this.latitude}, ${this.longitude}"
+        AppHelper.searchNearbyMerto(currentLocation, this)
+    }
+
+    override fun dataNotFetched() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun dataFetched() {
+        val nameList = AppHelper.placeNameList
+        if (nameList.count() == 0) {
+            Log.e(TAG, "Invalid placeName list")
+            return
+        }
+        this.metroList.removeAll { true }
+        for (name in nameList) {
+            val results = AppHelper.searchTextMetro(name)
+            if (results.count() == 0) {
+                Log.e(TAG, "No valid result")
+                return
+            }
+            this.metroList.add(results.first())
+
+        }
+        if (this.metroList.count() == 0) {
+            Log.e(TAG, "No valid data in metroList")
+            return
+        }
+        this.mapFragment.getMapAsync(this@MenuActivity)
+    }
 }
-
-
-
-
-

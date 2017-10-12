@@ -26,6 +26,13 @@ object AppHelper {
     val LOCATION_DEFAULT_CODE: String = android.Manifest.permission.ACCESS_FINE_LOCATION
     val NETWORK_DEFAULT_CODE: String = android.Manifest.permission.ACCESS_NETWORK_STATE
 
+    var placeNameList = ArrayList<String>()
+    lateinit var placeAPIListener: GooglePlacesAPICompletionListener
+    interface GooglePlacesAPICompletionListener {
+        fun dataFetched()
+        fun dataNotFetched()
+    }
+
     // Extension for AssetManager
     private fun AssetManager.fileAsString(fileName: String): String {
         return open(fileName).use {
@@ -75,21 +82,26 @@ object AppHelper {
                 .asJsonObject()
                 .setCallback { e, result ->
                     if (e != null) {
+                        this.placeAPIListener.dataNotFetched()
                         Log.e(TAG, "Google Place Request Error: ${e.message}")
                     }
 
                     result?.let {
                         if (result["status"].asString != "OK") {
+                            this.placeAPIListener.dataNotFetched()
                             Log.d(TAG, "Failed to fetch data: ${result["status"].asString}")
                         }
-
+                        this.placeNameList.removeAll { true }
                         val rootDataArr = result["results"].asJsonArray
                         for (data in rootDataArr) {
                             val indexDataArr = data.asJsonObject
-                            val name = indexDataArr["name"]
-                            val placeID = indexDataArr["place_id"]
-                            Log.d(TAG, "Location Detail, Name: ${name}, ID: ${placeID}")
+                            var name = indexDataArr["name"].toString()
+                            name = strTrim(name)
+                            val placeID = indexDataArr["place_id"].toString()
+                            this.placeNameList.add(name)
+                            Log.d(TAG, "Location Detail, Name: $name, ID: $placeID")
                         }
+                        this.placeAPIListener.dataFetched()
                     }
                 }
     }
@@ -102,5 +114,15 @@ object AppHelper {
         }
 
         return false
+    }
+
+    private fun strTrim(content: String): String {
+        var copy = content.removeSurrounding("\"")
+        val dataArr = copy.split(" ")
+        copy = ""
+        dataArr
+                .filter { it != "Station" }
+                .forEach{ copy += (it + " ") }
+        return copy.trim()
     }
 }
