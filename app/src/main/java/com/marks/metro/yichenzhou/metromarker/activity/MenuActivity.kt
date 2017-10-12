@@ -30,7 +30,7 @@ import kotlinx.android.synthetic.main.main_menu.*
 import org.jetbrains.anko.activityUiThread
 import org.jetbrains.anko.doAsync
 
-class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnMapReadyCallback, AppHelper.GooglePlacesAPICompletionListener {
+class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnMapReadyCallback, AppHelper.GooglePlacesAPICompletionListener, GoogleMap.OnInfoWindowClickListener {
     private val TAG = "MenuActivity"
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -124,6 +124,18 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         }
         map.setMaxZoomPreference(15.0f)
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0))
+
+        map.setOnInfoWindowClickListener(this)
+    }
+
+    override fun onInfoWindowClick(marker: Marker?) {
+        if (marker == null) {
+            Log.e(TAG, "marker object is null")
+            return
+        }
+        Log.d(TAG, "You pressed ${marker.title}")
+        val intent = Intent(this, LandMarkDetailActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
