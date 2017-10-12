@@ -69,11 +69,6 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         //Setup toolBar
         this.setSupportActionBar(toolbar)
 
-        explore_button.setOnClickListener {
-            //explore button listener
-            exploreMetroStation()
-
-        }
 
         this.favorite_button.setOnClickListener {
             //favorite button listener
@@ -84,6 +79,11 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
             //explore button listener
             exploreMetroStation()
 
+        }
+
+        this.nearest_button.setOnClickListener {
+            //TODO
+            //show the landmarks
         }
     }
 
