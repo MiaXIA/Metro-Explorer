@@ -30,7 +30,7 @@ import kotlinx.android.synthetic.main.main_menu.*
 import org.jetbrains.anko.activityUiThread
 import org.jetbrains.anko.doAsync
 
-class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnMapReadyCallback, AppHelper.GooglePlacesAPICompletionListener, GoogleMap.OnInfoWindowClickListener {
+class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnMapReadyCallback, AppHelper.GooglePlacesAPICompletionListener, GoogleMap.OnInfoWindowClickListener, AppHelper.YelpAPICompletionListener {
     private val TAG = "MenuActivity"
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -57,6 +57,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         this.locationDetector = LocationDetector(this)
         this.locationDetector.locationListener = this
         AppHelper.placeAPIListener = this
+        AppHelper.yelpAPIListener = this
 
         // Fetch current location and show on the mapView
         if (AppHelper.checkPermissionStatus(AppHelper.LOCATION_DEFAULT_CODE, this)) {
@@ -81,6 +82,9 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
             this.locationDetector.detectLocation()
             this.mapFragment.getMapAsync(this)
         }
+
+        // Fetch Yelp Token for later using
+        AppHelper.yelpTokenChecker(this)
     }
 
     private fun loadMetroData() {
@@ -133,8 +137,16 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
             Log.e(TAG, "marker object is null")
             return
         }
+
+        if (marker.title == "My Location") {
+            return
+        }
+
         Log.d(TAG, "You pressed ${marker.title}")
-        val intent = Intent(this, LandMarkDetailActivity::class.java)
+        val intent = Intent(this, MetroDetailActivity::class.java)
+        intent.putExtra("name", marker.title)
+        intent.putExtra("lang", marker.position.latitude)
+        intent.putExtra("long", marker.position.longitude)
         startActivity(intent)
     }
 
@@ -197,9 +209,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
                 Log.d(TAG, "Query Positiont: $position")
                 Log.d(TAG, "Query Key: $key")
                 Log.d(TAG, "Query Content: $content")
-
-
-
+                
                 val results = AppHelper.searchTextMetro(key)
                 if (results.count() == 0) {
                     Log.e(TAG, "No valid metro data")
@@ -248,5 +258,13 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
             return
         }
         this.mapFragment.getMapAsync(this@MenuActivity)
+    }
+
+    override fun yelpDataFetched() {
+        Log.d(TAG, "YELP Token Fetched")
+    }
+
+    override fun yelpDataNotFetched() {
+        Log.e(TAG, "YELP Token Not Fetched")
     }
 }
