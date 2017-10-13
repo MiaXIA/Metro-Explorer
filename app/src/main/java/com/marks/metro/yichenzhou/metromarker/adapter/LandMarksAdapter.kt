@@ -4,22 +4,23 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import com.marks.metro.yichenzhou.metromarker.R
+import com.marks.metro.yichenzhou.metromarker.model.Landmark
 
 /**
  * Created by mc.xia on 2017/10/9.
  */
 
-class LandMarksAdapter() : RecyclerView.Adapter<LandMarksAdapter.ViewHolder>() {
+class LandMarksAdapter(landmarks: ArrayList<Landmark>) : RecyclerView.Adapter<LandMarksAdapter.ViewHolder>() {
+    val landmarkList = landmarks
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        //TODO
+        val landmark = this.landmarkList?.get(position)
+        landmark?.let { (holder as ViewHolder).bind(landmark, position) }
     }
 
     override fun getItemCount(): Int {
-        //TODO
-        return 0
+        return this.landmarkList.count()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -28,12 +29,14 @@ class LandMarksAdapter() : RecyclerView.Adapter<LandMarksAdapter.ViewHolder>() {
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        //TODO
-        //private val landmarkImageView: ImageView
-        //private val landmarkTextView: TextView
+        private val nameTextView: TextView = view.findViewById(R.id.nameText)
+        private val ratingTextView: TextView = view.findViewById(R.id.ratingText)
+        private val infoTextView: TextView = view.findViewById(R.id.infoText)
 
-        //init {
-
-        //}
+        fun bind(landmark: Landmark, position: Int) {
+             nameTextView.text = (position + 1).toString() + ". " + landmark.name
+             ratingTextView.text = landmark.rating.toString() + "/5.0"
+             infoTextView.text = landmark.category
+         }
     }
 }

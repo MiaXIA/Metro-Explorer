@@ -2,6 +2,7 @@ package com.marks.metro.yichenzhou.metromarker.activity
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -9,6 +10,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.marks.metro.yichenzhou.metromarker.R
+import com.marks.metro.yichenzhou.metromarker.adapter.LandMarksAdapter
 import com.marks.metro.yichenzhou.metromarker.helper.AppHelper
 import com.marks.metro.yichenzhou.metromarker.model.Landmark
 import kotlinx.android.synthetic.main.metro_detail.*
@@ -42,8 +44,6 @@ class MetroDetailActivity : AppCompatActivity(), OnMapReadyCallback, AppHelper.Y
         if (this.latitude != null && this.longitude != null) {
             AppHelper.yelpLandmarkFetcher(this.latitude!!, this.longitude!!, this)
         }
-        //TODO
-        //set listview adapter and clicklistener
     }
 
     override fun onMapReady(map: GoogleMap?) {
@@ -52,7 +52,7 @@ class MetroDetailActivity : AppCompatActivity(), OnMapReadyCallback, AppHelper.Y
             return
         }
         if (this.latitude == null || this.longitude == null) {
-            Log.e(TAG, "Lantitude or longitude is null")
+            Log.e(TAG, "Latitude or longitude is null")
             return
         }
         val builder = LatLngBounds.Builder()
@@ -71,6 +71,8 @@ class MetroDetailActivity : AppCompatActivity(), OnMapReadyCallback, AppHelper.Y
     override fun yelpDataFetched() {
         this.landmarkList.removeAll { true }
         this.landmarkList = AppHelper.landmarkList
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = LandMarksAdapter(this.landmarkList)
         for (landmark in this.landmarkList) {
             Log.d(TAG, landmark.toString())
         }

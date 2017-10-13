@@ -192,9 +192,6 @@ object AppHelper {
             Log.e(TAG, "Toke data is null")
             return
         }
-        Log.d(TAG, "Check: ${latitude}")
-        Log.d(TAG, "Check: ${longitude}")
-        Log.d(TAG, "Check: Bearer $token")
         Ion.with(context)
                 .load(YELP_SEARCH_URL)
                 .setHeader("Authorization", "Bearer $token")
