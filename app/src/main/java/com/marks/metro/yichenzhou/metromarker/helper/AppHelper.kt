@@ -6,7 +6,9 @@ import android.content.res.AssetManager
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.koushikdutta.ion.Ion
+import com.marks.metro.yichenzhou.metromarker.model.Landmark
 import com.marks.metro.yichenzhou.metromarker.model.MetroStation
+import com.marks.metro.yichenzhou.metromarker.model.Token
 import io.realm.Case
 import io.realm.Realm
 import java.nio.charset.Charset
@@ -20,17 +22,27 @@ object AppHelper {
     val GOOGLE_PLACES_KEY = "AIzaSyAGQWfAqWM8pzYtjbHIN_hhNhcE4BzS2UU"
     val GOOGLE_PLACES_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 
-    val LOCATION_PERMISSION_REQUEST_CODE: Int = 777
-    val NETWORK_PERMISSION_REQUEST_CODE: Int = 778
+    val YELP_GRANT_TYPE = "OAuth2"
+    val YELP_CLIENT_ID = "T4BbE1hqE-GAFC8HZvpqDQ"
+    val YELP_CLIENT_SECRET = "99TMJOdPSOMv26oelKEQowXPAnRZ7Jt3crrPuAGkniaizVkzDiqSiysGXCgbiXgW"
+    val YELP_TOKEN_URL = "https://api.yelp.com/oauth2/token"
+    val YELP_SEARCH_URL = "https://api.yelp.com/v3/businesses/search"
 
+    val LOCATION_PERMISSION_REQUEST_CODE: Int = 777
     val LOCATION_DEFAULT_CODE: String = android.Manifest.permission.ACCESS_FINE_LOCATION
-    val NETWORK_DEFAULT_CODE: String = android.Manifest.permission.ACCESS_NETWORK_STATE
 
     var placeNameList = ArrayList<String>()
     lateinit var placeAPIListener: GooglePlacesAPICompletionListener
     interface GooglePlacesAPICompletionListener {
         fun dataFetched()
         fun dataNotFetched()
+    }
+
+    var landmarkList = ArrayList<Landmark>()
+    lateinit var yelpAPIListener: YelpAPICompletionListener
+    interface YelpAPICompletionListener {
+        fun yelpDataFetched()
+        fun yelpDataNotFetched()
     }
 
     // Extension for AssetManager
@@ -99,7 +111,6 @@ object AppHelper {
                             name = strTrim(name)
                             val placeID = indexDataArr["place_id"].toString()
                             this.placeNameList.add(name)
-                            Log.d(TAG, "Location Detail, Name: $name, ID: $placeID")
                         }
                         this.placeAPIListener.dataFetched()
                     }
@@ -124,5 +135,88 @@ object AppHelper {
                 .filter { it != "Station" }
                 .forEach{ copy += (it + " ") }
         return copy.trim()
+    }
+
+    fun yelpTokenChecker(context: Context) {
+        val realm = Realm.getDefaultInstance()
+        val objects = realm.where(Token::class.java).findAll()
+        if (objects.count() == 0) {
+            this.yelpTokenFetcher(context)
+        } else {
+            Log.d(TAG, "Yelp API Token Already Fetched")
+        }
+    }
+
+    private fun yelpTokenFetcher(context: Context) {
+        Ion.with(context)
+                .load(YELP_TOKEN_URL)
+                .setBodyParameter("grant_type", YELP_GRANT_TYPE)
+                .setBodyParameter("client_id", YELP_CLIENT_ID)
+                .setBodyParameter("client_secret", YELP_CLIENT_SECRET)
+                .asJsonObject()
+                .setCallback { e, result ->
+                    if (e != null) {
+                        this.yelpAPIListener.yelpDataNotFetched()
+                        Log.e(TAG, "Yelp API Token Request Error ${e.message}")
+                        return@setCallback
+                    }
+
+                    result?.let {
+                        val dataObject = result.asJsonObject
+                        val tokenStr = dataObject["access_token"].toString().removeSurrounding("\"")
+                        try {
+                            val realm = Realm.getDefaultInstance()
+                            realm.executeTransaction {
+                                val tokenObject = realm.createObject(Token::class.java)
+                                tokenObject.yelpTokenStr = tokenStr
+                            }
+                            this.yelpAPIListener.yelpDataFetched()
+                        } catch (e: Exception) {
+                            this.yelpAPIListener.yelpDataNotFetched()
+                            Log.e(TAG, e.message)
+                        }
+                    }
+                }
+    }
+
+    fun yelpLandmarkFetcher(latitude: Double, longitude: Double, context: Context) {
+        // Get Yelp API Token From Database
+        val realm = Realm.getDefaultInstance()
+        val objects = realm.where(Token::class.java).findAll()
+        if (objects.count() == 0) {
+            Log.e(TAG, "No valid token data")
+            return
+        }
+        val token = objects.first().yelpTokenStr
+        if (token == null) {
+            Log.e(TAG, "Toke data is null")
+            return
+        }
+        Log.d(TAG, "Check: ${latitude}")
+        Log.d(TAG, "Check: ${longitude}")
+        Log.d(TAG, "Check: Bearer $token")
+        Ion.with(context)
+                .load(YELP_SEARCH_URL)
+                .setHeader("Authorization", "Bearer $token")
+                .addQuery("latitude", latitude.toString())
+                .addQuery("longitude", longitude.toString())
+                .asJsonObject()
+                .setCallback { e, result ->
+                    if (e != null) {
+                        this.yelpAPIListener.yelpDataNotFetched()
+                        Log.e(TAG, "Yelp API Token Request Error ${e.message}")
+                        return@setCallback
+                    }
+                    result?.let {
+                        this.landmarkList.removeAll { true }
+                        val rootDataArr = result["businesses"].asJsonArray
+                        for (data in rootDataArr) {
+                            var landmark = Landmark()
+                            landmark.parseData(data)
+                            this.landmarkList.add(landmark)
+                        }
+                        this.yelpAPIListener.yelpDataFetched()
+                    }
+                }
     }
 }
