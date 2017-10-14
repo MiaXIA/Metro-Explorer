@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.view.Menu
 import android.support.v7.widget.Toolbar
+import android.widget.ProgressBar
 import ca.allanwang.kau.searchview.SearchItem
 import ca.allanwang.kau.searchview.SearchView
 import ca.allanwang.kau.searchview.bindSearchView
@@ -54,6 +55,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         this.loadMetroData()
         this.locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         this.mapFragment = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
+        this.showLoading(true)
         this.locationDetector = LocationDetector(this)
         this.locationDetector.locationListener = this
         AppHelper.placeAPIListener = this
@@ -74,6 +76,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         }
         
         this.nearest_button.setOnClickListener {
+            this.showLoading(true)
             this.fetchNearbyMetroStation()
         }
 
@@ -98,10 +101,19 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
             activityUiThread {
                 //TODO
                 //load the favorite list data and jump to the List UI
-                val intent = Intent(this@MenuActivity, LandMarksActivity::class.java)
+                val intent = Intent(this@MenuActivity, FavoriateActivity::class.java)
 
                 startActivity(intent)
             }
+        }
+    }
+
+    private fun showLoading(show: Boolean) {
+        if(show) {
+            menu_progress_bar.visibility = ProgressBar.VISIBLE
+        }
+        else {
+            menu_progress_bar.visibility = ProgressBar.INVISIBLE
         }
     }
 
@@ -111,6 +123,9 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
             return
         }
         val builder = LatLngBounds.Builder()
+        val width = resources.displayMetrics.widthPixels
+        val height = resources.displayMetrics.heightPixels
+        val padding = (width * 0.12).toInt()
         if (this.metroList.count() == 0) {
             // Show my current location when user launch the app
             val location = LatLng(this.latitude, this.longitude)
@@ -127,8 +142,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
             this.metroList.removeAll { true }
         }
         map.setMaxZoomPreference(15.0f)
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0))
-
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), width, height, padding))
         map.setOnInfoWindowClickListener(this)
     }
 
@@ -141,8 +155,6 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         if (marker.title == "My Location") {
             return
         }
-
-        Log.d(TAG, "You pressed ${marker.title}")
         val intent = Intent(this, MetroDetailActivity::class.java)
         intent.putExtra("name", marker.title)
         intent.putExtra("lang", marker.position.latitude)
@@ -175,9 +187,11 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         this.latitude = location.latitude
         this.longitude = location.longitude
         mapFragment.getMapAsync(this@MenuActivity)
+        this.showLoading(false)
     }
 
     override fun locationNotFound(reason: LocationDetector.FailureReason) {
+        this.showLoading(false)
         when(reason) {
             LocationDetector.FailureReason.TIMEOUT -> Log.e(TAG, "Location Detection Time Out")
             LocationDetector.FailureReason.NO_PERMISSION -> Log.e(TAG, "No Permission to detect location")
@@ -234,7 +248,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
     }
 
     override fun dataNotFetched() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        this.showLoading(false)
     }
 
     override fun dataFetched() {
@@ -254,9 +268,11 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
 
         }
         if (this.metroList.count() == 0) {
+            this.showLoading(false)
             Log.e(TAG, "No valid data in metroList")
             return
         }
+        this.showLoading(false)
         this.mapFragment.getMapAsync(this@MenuActivity)
     }
 

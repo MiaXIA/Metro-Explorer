@@ -8,7 +8,7 @@ import android.widget.ImageView
 import com.marks.metro.yichenzhou.metromarker.R
 import kotlinx.android.synthetic.main.landmark_list.*
 
-class LandMarksActivity : AppCompatActivity() {
+class FavoriateActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

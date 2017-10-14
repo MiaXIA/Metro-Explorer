@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.widget.ImageView
 import com.koushikdutta.ion.Ion
 import com.marks.metro.yichenzhou.metromarker.model.Landmark
 import com.marks.metro.yichenzhou.metromarker.model.MetroStation
@@ -215,5 +216,13 @@ object AppHelper {
                         this.yelpAPIListener.yelpDataFetched()
                     }
                 }
+    }
+
+    fun yelpImageFetcher(url: String, imageView: ImageView) {
+        Ion.with(imageView).load(url).setCallback { e, _ ->
+            if (e != null) {
+                Log.e(TAG, "${e.localizedMessage}")
+            }
+        }
     }
 }
