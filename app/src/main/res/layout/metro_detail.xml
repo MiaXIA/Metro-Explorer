@@ -37,9 +37,10 @@
         />
 
         <ProgressBar
-            android:id="@+id/menu_progress_bar"
+            android:id="@+id/metro_progress_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             android:indeterminateTint="@color/colorDarkBlue"
             android:layout_centerInParent="true"/>
 
