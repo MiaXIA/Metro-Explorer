@@ -66,6 +66,7 @@ open class Landmark {
     }
 
     fun parseIntentData(intent: Intent) {
+        this.id = intent.getStringExtra("id")
         this.name = intent.getStringExtra("name")
         this.latitude = intent.getDoubleExtra("lang", 0.0)
         this.longitude = intent.getDoubleExtra("long", 0.0)

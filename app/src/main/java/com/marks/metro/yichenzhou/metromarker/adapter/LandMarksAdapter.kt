@@ -19,8 +19,9 @@ import com.marks.metro.yichenzhou.metromarker.model.Landmark
  */
 
 class LandMarksAdapter(landmarks: ArrayList<Landmark>) : RecyclerView.Adapter<LandMarksAdapter.ViewHolder>() {
-    val TAG = "LandMarksAdapter"
-    val landmarkList = landmarks
+    private val TAG = "LandMarksAdapter"
+    private val landmarkList = landmarks
+
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val landmark = this.landmarkList?.get(position)
         landmark?.let {
@@ -65,6 +66,7 @@ class LandMarksAdapter(landmarks: ArrayList<Landmark>) : RecyclerView.Adapter<La
         override fun onClick(view: View?) {
             Log.d(TAG, "You pressed cell ${this.position}")
             val intent = Intent(view?.context, LandMarkDetailActivity::class.java)
+            intent.putExtra("id", this.landmark.id)
             intent.putExtra("name", this.landmark.name)
             intent.putExtra("lang", this.landmark.latitude)
             intent.putExtra("long", this.landmark.longitude)

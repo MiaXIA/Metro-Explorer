@@ -27,9 +27,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MetroStationActivity" />
         <activity android:name=".activity.LandMarkDetailActivity" />
-        <activity android:name=".activity.FavoriateActivity" />
+        <activity android:name=".activity.FavoriteActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

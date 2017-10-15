@@ -101,7 +101,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
             activityUiThread {
                 //TODO
                 //load the favorite list data and jump to the List UI
-                val intent = Intent(this@MenuActivity, FavoriateActivity::class.java)
+                val intent = Intent(this@MenuActivity, FavoriteActivity::class.java)
 
                 startActivity(intent)
             }
