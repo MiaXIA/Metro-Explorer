@@ -11,5 +11,6 @@
     <string name="favorite_icon">我的收藏</string>
     <string name="land_mark_image">地标图像</string>
     <string name="title_activity_searchable">可搜索活动</string>
+    <string name="placeholder">*测试*</string>
     <string name="test">*测试专用*</string>
 </resources>
