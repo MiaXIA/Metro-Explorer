@@ -38,7 +38,8 @@
         <activity
             android:name=".activity.SearchableActivity"
             android:label="@string/title_activity_searchable"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:screenOrientation="unspecified">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
