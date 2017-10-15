@@ -1,8 +1,13 @@
 package com.marks.metro.yichenzhou.metromarker.helper
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
+import android.net.ConnectivityManager
+import android.provider.Settings
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.widget.ImageView
@@ -223,6 +228,26 @@ object AppHelper {
             if (e != null) {
                 Log.e(TAG, "${e.localizedMessage}")
             }
+        }
+    }
+
+    fun networkStatusChecker(context: Context) {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = cm.activeNetworkInfo
+        val isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting
+
+        val builder = AlertDialog.Builder(context)
+        if (!isConnected) {
+            builder.setMessage("Bummer! Network is not available, please check your network status.")
+            builder.setCancelable(true)
+            builder.setPositiveButton("OK", DialogInterface.OnClickListener {
+                dialogInterface, _ ->
+                dialogInterface.cancel()
+                val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS)
+                context.startActivity(intent)
+            })
+            val alert = builder.create()
+            alert.show()
         }
     }
 }

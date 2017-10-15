@@ -47,8 +47,10 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_menu)
 
+        // Check Network Status
+        AppHelper.networkStatusChecker(this)
+        // Request Location Fetching Permission
         this.requestPermission()
-
         // Properties Initialization
         Realm.init(applicationContext)
         this.realm = Realm.getDefaultInstance()
@@ -76,6 +78,7 @@ class MenuActivity : AppCompatActivity(), LocationDetector.LocationListener, OnM
         }
         
         this.nearest_button.setOnClickListener {
+            AppHelper.networkStatusChecker(this)
             this.showLoading(true)
             this.fetchNearbyMetroStation()
         }

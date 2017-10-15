@@ -28,7 +28,9 @@ class MetroDetailActivity : AppCompatActivity(), OnMapReadyCallback, AppHelper.Y
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.metro_detail)
-        
+
+        // Check Network Status
+        AppHelper.networkStatusChecker(this)
         // Fetch data from intent extras
         this.metroName = intent.getStringExtra("name")
         this.latitude = intent.getDoubleExtra("lang", 0.0)
