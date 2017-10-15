@@ -1,5 +1,6 @@
 package com.marks.metro.yichenzhou.metromarker.model
 
+import android.content.Intent
 import com.google.gson.JsonElement
 
 /**
@@ -62,5 +63,20 @@ open class Landmark {
         this.price = price
         this.address = address
         this.distance = distance
+    }
+
+    fun parseIntentData(intent: Intent) {
+        this.name = intent.getStringExtra("name")
+        this.latitude = intent.getDoubleExtra("lang", 0.0)
+        this.longitude = intent.getDoubleExtra("long", 0.0)
+        this.address = intent.getStringExtra("address")
+        this.category = intent.getStringExtra("category")
+        this.rating = intent.getDoubleExtra("rating", 0.0)
+        this.price = intent.getStringExtra("price")
+        this.reviewURL = intent.getStringExtra("url")
+        this.imageURL = intent.getStringExtra("imageURL")
+        this.isClose = intent.getBooleanExtra("isClose", true)
+        this.reviewCount = intent.getIntExtra("reviewCount", 0)
+        this.distance = intent.getDoubleExtra("distance", 0.0)
     }
 }

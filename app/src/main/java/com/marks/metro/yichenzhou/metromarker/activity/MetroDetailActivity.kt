@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.widget.ProgressBar
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -27,7 +28,7 @@ class MetroDetailActivity : AppCompatActivity(), OnMapReadyCallback, AppHelper.Y
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.metro_detail)
-
+        
         // Fetch data from intent extras
         this.metroName = intent.getStringExtra("name")
         this.latitude = intent.getDoubleExtra("lang", 0.0)
@@ -42,6 +43,7 @@ class MetroDetailActivity : AppCompatActivity(), OnMapReadyCallback, AppHelper.Y
         // Fetch data from Yelp
         AppHelper.yelpAPIListener = this
         if (this.latitude != null && this.longitude != null) {
+            this.showLoading(true)
             AppHelper.yelpLandmarkFetcher(this.latitude!!, this.longitude!!, this)
         }
     }
@@ -56,12 +58,24 @@ class MetroDetailActivity : AppCompatActivity(), OnMapReadyCallback, AppHelper.Y
             return
         }
         val builder = LatLngBounds.Builder()
+        val width = resources.displayMetrics.widthPixels
+        val height = resources.displayMetrics.heightPixels
+        val padding = (width * 0.12).toInt()
         val location = LatLng(this.latitude!!, this.longitude!!)
         builder.include(location)
         map.clear()
         map.addMarker(MarkerOptions().position(location).title(this.metroName).icon(this.markerIcon(BitmapDescriptorFactory.HUE_AZURE)))
         map.setMaxZoomPreference(17.0f)
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0))
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), width, height, padding))
+    }
+
+    private fun showLoading(show: Boolean) {
+        if(show) {
+            metro_progress_bar.visibility = ProgressBar.VISIBLE
+        }
+        else {
+            metro_progress_bar.visibility = ProgressBar.INVISIBLE
+        }
     }
 
     private fun markerIcon(color: Float): BitmapDescriptor {
@@ -73,12 +87,10 @@ class MetroDetailActivity : AppCompatActivity(), OnMapReadyCallback, AppHelper.Y
         this.landmarkList = AppHelper.landmarkList
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = LandMarksAdapter(this.landmarkList)
-        for (landmark in this.landmarkList) {
-            Log.d(TAG, landmark.toString())
-        }
+        this.showLoading(false)
     }
 
     override fun yelpDataNotFetched() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        this.showLoading(false)
     }
 }
