@@ -34,6 +34,9 @@ object AppHelper {
     val YELP_TOKEN_URL = "https://api.yelp.com/oauth2/token"
     val YELP_SEARCH_URL = "https://api.yelp.com/v3/businesses/search"
 
+    val WMATA_API_URL = "https://api.wmata.com/Rail.svc/json/jStations"
+    val WMATA_API_KEY = "6f41a1603c704b57ba2e1e5741f79450"
+
     val LOCATION_PERMISSION_REQUEST_CODE: Int = 777
     val LOCATION_DEFAULT_CODE: String = android.Manifest.permission.ACCESS_FINE_LOCATION
 
@@ -76,6 +79,7 @@ object AppHelper {
                 }
             }
         } catch (e: Exception) {
+            AppHelper.metroDatabaseRecover(context)
             Log.e(TAG, e.message)
         }
         return  null
@@ -132,7 +136,7 @@ object AppHelper {
 
         return false
     }
-
+    // Trim string
     private fun strTrim(content: String): String {
         var copy = content.removeSurrounding("\"")
         val dataArr = copy.split(" ")
@@ -142,7 +146,7 @@ object AppHelper {
                 .forEach{ copy += (it + " ") }
         return copy.trim()
     }
-
+    // Check yelp token if is available
     fun yelpTokenChecker(context: Context) {
         val realm = Realm.getDefaultInstance()
         val objects = realm.where(Token::class.java).findAll()
@@ -152,7 +156,7 @@ object AppHelper {
             Log.d(TAG, "Yelp API Token Already Fetched")
         }
     }
-
+    // Yelp token fetcher
     private fun yelpTokenFetcher(context: Context) {
         Ion.with(context)
                 .load(YELP_TOKEN_URL)
@@ -184,7 +188,7 @@ object AppHelper {
                     }
                 }
     }
-
+    // Yelp data fetcher
     fun yelpLandmarkFetcher(latitude: Double, longitude: Double, context: Context) {
         // Get Yelp API Token From Database
         val realm = Realm.getDefaultInstance()
@@ -223,6 +227,7 @@ object AppHelper {
                 }
     }
 
+    // Yelp data image fetcher
     fun yelpImageFetcher(url: String, imageView: ImageView) {
         Ion.with(imageView).load(url).setCallback { e, _ ->
             if (e != null) {
@@ -231,6 +236,7 @@ object AppHelper {
         }
     }
 
+    // Device Network status checker
     fun networkStatusChecker(context: Context) {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = cm.activeNetworkInfo
@@ -249,5 +255,39 @@ object AppHelper {
             val alert = builder.create()
             alert.show()
         }
+    }
+
+    // Reload Metro Station Database by Requesting from WMATA API
+    private fun metroDatabaseRecover(context: Context) {
+        Realm.init(context)
+        val realm = Realm.getDefaultInstance()
+        realm.where(MetroStation::class.java).findAll().deleteAllFromRealm()
+        Ion.with(context).load(WMATA_API_URL)
+                .setHeader("api_key", WMATA_API_KEY)
+                .asJsonObject()
+                .setCallback {
+                    e, result ->
+                    if (e != null) {
+                        Log.e(TAG, "${e.message}")
+                    }
+
+                    result?.let {
+                        val rootDataArr = result["Stations"].asJsonArray
+                        for (data in rootDataArr) {
+                            val dataArr = data.asJsonObject
+                            realm.executeTransaction {
+                                val metro = realm.createObject(MetroStation::class.java)
+                                metro.name = dataArr["Name"].toString().removeSurrounding("\"")
+                                metro.lang = dataArr["Lat"].asDouble.toString()
+                                metro.long = dataArr["Lon"].asDouble.toString()
+                                val address = dataArr["Address"].asJsonObject
+                                metro.street = address["Street"].asString
+                                metro.city = address["City"].asString
+                                metro.state = address["State"].asString
+                                metro.zip = address["Zip"].asString
+                            }
+                        }
+                    }
+                }
     }
 }

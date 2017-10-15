@@ -16,7 +16,6 @@ import com.marks.metro.yichenzhou.metromarker.helper.AppHelper
 import com.marks.metro.yichenzhou.metromarker.model.Landmark
 import kotlinx.android.synthetic.main.metro_detail.*
 
-
 class MetroDetailActivity : AppCompatActivity(), OnMapReadyCallback, AppHelper.YelpAPICompletionListener {
     private val TAG = "MetroDetailActivity"
     private lateinit var metroName: String
