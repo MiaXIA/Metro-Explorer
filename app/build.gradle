@@ -10,6 +10,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
+        multiDexEnabled true
         applicationId "com.marks.metro.yichenzhou.metromarker"
         minSdkVersion 22
         targetSdkVersion 26
@@ -45,5 +46,6 @@ dependencies {
     compile "ca.allanwang.kau:core-ui:3.4.3"
     compile "ca.allanwang.kau:searchview:3.4.3"
     compile 'com.android.support:design:26.1.0'
-
 }
+
+
