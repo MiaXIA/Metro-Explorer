@@ -11,5 +11,6 @@
     <string name="favorite_icon">My Favorite</string>
     <string name="land_mark_image">Land Mark Image</string>
     <string name="title_activity_searchable">SearchableActivity</string>
+    <string name="placeholder">Lorem Ipsum</string>
     <string name="test">*TEST*</string>
 </resources>

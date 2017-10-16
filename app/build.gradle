@@ -41,7 +41,7 @@ dependencies {
     compile 'com.koushikdutta.ion:ion:2.+'
     compile 'com.google.code.gson:gson:2.8.1'
     compile "org.jetbrains.anko:anko-commons:0.10.1"
-    
+
     compile "ca.allanwang.kau:core-ui:3.4.3"
     compile "ca.allanwang.kau:searchview:3.4.3"
     compile 'com.android.support:design:26.1.0'
