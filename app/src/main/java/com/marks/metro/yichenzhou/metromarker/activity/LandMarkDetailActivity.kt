@@ -30,6 +30,7 @@ class LandMarkDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.landmark_detail)
 
+        // Properties Initialization
         Realm.init(applicationContext)
         this.landmark.parseIntentData(intent)
         this.mapFragment = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
@@ -75,7 +76,7 @@ class LandMarkDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         val padding = (width * 0.12).toInt()
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), width, height, padding))
     }
-
+    // Set marker's color
     private fun markerIcon(color: Float): BitmapDescriptor {
         return BitmapDescriptorFactory.defaultMarker(color)
     }
