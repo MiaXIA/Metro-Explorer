@@ -3,7 +3,7 @@ Team Member: Mochen Xia, Yichen Zhou
 
 It is a location-base service application that aimed to explore the landmarks around the DC metro stations and build a favorite list to mobile users. 
 
--Tools for developing: Andriod Studio 3.0, MockingBot, Realm  
+- Tools for developing: Andriod Studio 3.0, MockingBot, Realm  
 
 
 - Responsibilities:  
@@ -12,11 +12,11 @@ Mochen Xia: Design the UI layout, build the interactive prototype, build the XML
 Yichen Zhou: Design and implement the database and model functions.  
 
 
-- [UI Design File](https://drive.google.com/open?id=0B9DeFVR4K9yMTkFEeXdvMVZSdTQ)
+- [UI Design File](https://drive.google.com/open?id=0B9DeFVR4K9yMTkFEeXdvMVZSdTQ)  
 Author: Mochen Xia
 
-- [Application Report](https://drive.google.com/open?id=1ZnYkeZ3XKdLM4L23OvQrDq3PR6wPhlkZ)
+- [Application Report](https://drive.google.com/open?id=1ZnYkeZ3XKdLM4L23OvQrDq3PR6wPhlkZ)  
 Author: Mochen Xia
 
-- [User Testing Video](https://www.youtube.com/watch?v=GcepWeGLdLA&t=18s)
+- [User Testing Video](https://www.youtube.com/watch?v=GcepWeGLdLA&t=18s)  
 Author: Mochen Xia
